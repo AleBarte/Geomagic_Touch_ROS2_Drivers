@@ -1,23 +1,27 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>omni_msgs</name>
-  <description>The omni_msgs package</description>
+  <version>0.0.0</version>
+  <description>omni_msgs ros2 package</description>
+  <maintainer email="alexbartesaghi@gmail.com">alebarte</maintainer>
+  <license>Apache-2.0</license>
+  <author>Alessandro Bartesaghi</author>
 
-  <version>0.1.0</version>
-  <maintainer email="fsuarez6@gmail.com">Francisco Suarez-Ruiz</maintainer>
-  <license>BSD</license>
-  <url type="website">https://github.com/fsuarez6/phantom_omni</url>
-  <url type="repository">https://github.com/fsuarez6/phantom_omni</url>
-  <author>Francisco Suarez-Ruiz</author>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>rclcpp</depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
   
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <build_depend>message_generation</build_depend>
-  <run_depend>message_runtime</run_depend>
-  
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
 </package>
