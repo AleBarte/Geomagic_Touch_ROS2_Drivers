@@ -6,7 +6,7 @@
 #include "geometry_msgs/msg/twist_stamped.hpp"
 #include "geometry_msgs/msg/wrench_stamped.hpp"
 #include "sensor_msgs/msg/joint_state.hpp"
-#include "joy_msgs/msg/joy.hpp"
+#include "sensor_msgs/msg/joy.hpp"
 
 #include <string.h>
 #include <stdio.h>
@@ -70,7 +70,7 @@ private:
     rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_publisher_;
     rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_publisher_;
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher_;
-    rclcpp::Publisher<joy_msgs::msg::Joy>::SharedPtr button_publisher_;
+    rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr button_publisher_;
     rclcpp::Publisher<omni_msgs::msg::OmniButtonEvent>::SharedPtr button_event_publisher_;
     rclcpp::Subscription<omni_msgs::msg::OmniFeedback>::SharedPtr haptic_sub_;
     OmniState* state_;

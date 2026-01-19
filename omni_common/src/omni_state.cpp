@@ -23,7 +23,7 @@ geoRos::geoRos(const std::string &node_name)
     std::ostringstream stream2;
     stream2 << node_name << "/button";
     std::string button_topic = std::string(stream2.str());
-    this->button_publisher_ = this->create_publisher<joy_msgs::msg::Joy>(button_topic, 10);
+    this->button_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>(button_topic, 10);
 
     std::ostringstream stream3;
     stream3 << node_name << "/state";
@@ -144,9 +144,11 @@ void geoRos::publish()
     state_msg.pose.orientation.z = this->state_->rot.v()[2];
     state_msg.pose.orientation.w = this->state_->rot.s();
     // Velocity
-    state_msg.twist.linear.x = this->state_->velocity[0];
-    state_msg.twist.linear.y = this->state_->velocity[1];
-    state_msg.twist.linear.z = this->state_->velocity[2];
+    state_msg.velocity.x= this->state_->velocity[0];
+    state_msg.velocity.y = this->state_->velocity[1];
+    state_msg.velocity.z = this->state_->velocity[2];
+    //TODO: Add Angular Velocity
+    //TODO: Purge from this insane msg definition
 
     state_msg.header.stamp = this->now();
     
@@ -181,9 +183,9 @@ void geoRos::publish()
     // Twist Message
     geometry_msgs::msg::TwistStamped twist_msg;
     twist_msg.header = state_msg.header;
-    twist_msg.twist.linear.x = state_msg.twist.linear.x;
-    twist_msg.twist.linear.y = state_msg.twist.linear.y;
-    twist_msg.twist.linear.z = state_msg.twist.linear.z;
+    twist_msg.twist.linear.x = state_msg.velocity.x;
+    twist_msg.twist.linear.y = state_msg.velocity.y;
+    twist_msg.twist.linear.z = state_msg.velocity.z;
     //TODO: Fill angular velocity
     twist_msg.twist.angular.x = 0.0;
     twist_msg.twist.angular.y = 0.0;
@@ -208,7 +210,8 @@ void geoRos::publish()
         this->button_event_publisher_->publish(button_event);
 
         // Publish button state
-        joy_msgs::msg::Joy button_msg;
+        sensor_msgs::msg::Joy button_msg;
+        button_msg.header = state_msg.header;
         button_msg.buttons.resize(2);
         button_msg.buttons[0] = this->state_->buttons[0];
         button_msg.buttons[1] = this->state_->buttons[1];

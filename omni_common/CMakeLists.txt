@@ -43,8 +43,9 @@ target_link_libraries(
   master
   ${OPENHAPTICS_HD_LIB}
   ${OPENHAPTICS_HDU_LIB}
-  rt
   ncurses
+  rt
+  pthread
 )
 
 ament_target_dependencies(master
