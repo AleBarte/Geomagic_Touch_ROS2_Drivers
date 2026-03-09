@@ -7,7 +7,7 @@ geoRos::geoRos(const std::string &node_name)
     // Parameter Declaration
     this->declare_parameter<std::string>("ref_frame", "omni_base");
     this->declare_parameter<std::string>("units", "mm");
-    this->declare_parameter<double>("publishing_rate", 500.0);
+    this->declare_parameter<double>("publishing_rate", 1000.0);
 
     //Parameter Retrieval
     this->ref_frame_ = this->get_parameter("ref_frame").as_string();
@@ -49,7 +49,7 @@ geoRos::geoRos(const std::string &node_name)
     std::ostringstream stream7;
     stream7 << node_name << "/force_feedback";
     std::string force_feedback_topic = std::string(stream7.str());
-    this->haptic_sub_ = this->create_subscription<omni_msgs::msg::OmniFeedback>(
+    this->haptic_sub_ = this->create_subscription<geometry_msgs::msg::WrenchStamped>(
         force_feedback_topic, 10,
         std::bind(&geoRos::forceCallback, this, std::placeholders::_1));
 
@@ -69,6 +69,7 @@ void geoRos::init(OmniState* s)
     this->state_->buttons_prev[1] = 0;
     hduVector3Dd zeros(0, 0, 0);
     this->state_->velocity = zeros;
+    this->state_->angular_velocity = zeros;
     this->state_->inp_vel1 = zeros;
     this->state_->inp_vel2 = zeros;
     this->state_->inp_vel3 = zeros;
@@ -103,7 +104,7 @@ void geoRos::init(OmniState* s)
 //-------------------------------------------------------------------------
 // Force Callback
 
-void geoRos::forceCallback(const omni_msgs::msg::OmniFeedback::SharedPtr msg)
+void geoRos::forceCallback(const geometry_msgs::msg::WrenchStamped::SharedPtr msg)
 {
 
     if (!this->is_initialized_)
@@ -112,13 +113,18 @@ void geoRos::forceCallback(const omni_msgs::msg::OmniFeedback::SharedPtr msg)
     //? The small damping term is added to stabilize the overall force feedback of the device.
     //? In case direct impedance matching is required, this term has to be removed.
 
-    this->state_->force[0] = msg->force.x - 0.001 * this->state_->velocity[0];
-    this->state_->force[1] = msg->force.y - 0.001 * this->state_->velocity[1];
-    this->state_->force[2] = msg->force.z - 0.001 * this->state_->velocity[2];
-
-    this->state_->lock_pos[0] = msg->position.x;
-    this->state_->lock_pos[1] = msg->position.y;
-    this->state_->lock_pos[2] = msg->position.z;
+    if (this->state_->buttons[1] == 1) {
+    this->state_->force[0] = msg->wrench.force.x - 0.0 * this->state_->velocity[0];
+    this->state_->force[1] = msg->wrench.force.y - 0.0 * this->state_->velocity[1];
+    this->state_->force[2] = msg->wrench.force.z - 0.0 * this->state_->velocity[2];
+    } else {
+    this->state_->force[0] = 0.0;
+    this->state_->force[1] = 0.0;
+    this->state_->force[2] = 0.0;  
+    }
+    // this->state_->lock_pos[0] = msg->position.x;
+    // this->state_->lock_pos[1] = msg->position.y;
+    // this->state_->lock_pos[2] = msg->position.z;
 }
 
 //-------------------------------------------------------------------------
@@ -147,6 +153,9 @@ void geoRos::publish()
     state_msg.velocity.x= this->state_->velocity[0];
     state_msg.velocity.y = this->state_->velocity[1];
     state_msg.velocity.z = this->state_->velocity[2];
+    state_msg.angular_velocity.x = this->state_->angular_velocity[0];
+    state_msg.angular_velocity.y = this->state_->angular_velocity[1];
+    state_msg.angular_velocity.z = this->state_->angular_velocity[2];
     //TODO: Add Angular Velocity
     //TODO: Purge from this insane msg definition
 
@@ -183,13 +192,13 @@ void geoRos::publish()
     // Twist Message
     geometry_msgs::msg::TwistStamped twist_msg;
     twist_msg.header = state_msg.header;
-    twist_msg.twist.linear.x = state_msg.velocity.x;
-    twist_msg.twist.linear.y = state_msg.velocity.y;
-    twist_msg.twist.linear.z = state_msg.velocity.z;
+    twist_msg.twist.linear.x = state_msg.velocity.x / 1000.0;
+    twist_msg.twist.linear.y = state_msg.velocity.y / 1000.0; 
+    twist_msg.twist.linear.z = state_msg.velocity.z / 1000.0;
     //TODO: Fill angular velocity
-    twist_msg.twist.angular.x = 0.0;
-    twist_msg.twist.angular.y = 0.0;
-    twist_msg.twist.angular.z = 0.0;
+    twist_msg.twist.angular.x = state_msg.angular_velocity.x;
+    twist_msg.twist.angular.y = state_msg.angular_velocity.y;
+    twist_msg.twist.angular.z = state_msg.angular_velocity.z;
 
     if ((this->state_->buttons[0] != this->state_->buttons_prev[0])
         || (this->state_->buttons[1] != this->state_->buttons_prev[1]))

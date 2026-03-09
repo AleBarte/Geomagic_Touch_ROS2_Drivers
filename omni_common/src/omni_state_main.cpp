@@ -59,7 +59,7 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
   feedback[1] = omni_state->force[2];
   feedback[2] = -omni_state->force[1];
   hdSetDoublev(HD_CURRENT_FORCE, feedback);
-
+  
   //Get buttons
   int nButtons = 0;
   hdGetIntegerv(HD_CURRENT_BUTTONS, &nButtons);
@@ -154,9 +154,20 @@ int main(int argc, char** argv)
     // Automatic Calibration
     HHD_Auto_Calibration();
 
+    // Calibration Result 
+    HDint calibStatus = hdCheckCalibration();
+    if (calibStatus == HD_CALIBRATION_OK)
+        RCLCPP_INFO(rclcpp::get_logger("main"), "Calibration OK");
+    else if (calibStatus == HD_CALIBRATION_NEEDS_UPDATE)
+        RCLCPP_INFO(rclcpp::get_logger("main"), "Calibration NEEDS UPDATE");
+    else if (calibStatus == HD_CALIBRATION_NEEDS_MANUAL_INPUT)
+        RCLCPP_INFO(rclcpp::get_logger("main"), "Calibration NEEDS MANUAL INPUT");
+    else
+    RCLCPP_INFO(rclcpp::get_logger("main"), "Calibration status unknown: %d", calibStatus);
+
     // Ros Node
     OmniState state;
-    auto geo_ros_node = std::make_shared<geoRos>("geo_ros_node");
+    auto geo_ros_node = std::make_shared<geoRos>("touch");
     geo_ros_node->init(&state);
     hdScheduleAsynchronous(
         omni_state_callback, &state, HD_MAX_SCHEDULER_PRIORITY);

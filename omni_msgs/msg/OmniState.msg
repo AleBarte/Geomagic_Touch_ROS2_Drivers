@@ -9,3 +9,5 @@ geometry_msgs/Pose      pose        # meters
 geometry_msgs/Vector3   current     # Amperes
 
 geometry_msgs/Vector3   velocity    # meters/s
+
+geometry_msgs/Vector3   angular_velocity # rad/s

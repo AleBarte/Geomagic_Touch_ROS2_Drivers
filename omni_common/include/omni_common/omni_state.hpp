@@ -32,6 +32,7 @@
 struct OmniState {
   hduVector3Dd position;  //3x1 vector of position
   hduVector3Dd velocity;  //3x1 vector of velocity
+  hduVector3Dd angular_velocity;
   hduVector3Dd inp_vel1;  //3x1 history of velocity used for filtering velocity estimate
   hduVector3Dd inp_vel2;
   hduVector3Dd inp_vel3;
@@ -63,7 +64,7 @@ public:
 private:
 
 
-    void forceCallback(const omni_msgs::msg::OmniFeedback::SharedPtr msg);
+    void forceCallback(const geometry_msgs::msg::WrenchStamped::SharedPtr msg);
     void publish();
 
     rclcpp::Publisher<omni_msgs::msg::OmniState>::SharedPtr state_publisher_;
@@ -72,7 +73,7 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_publisher_;
     rclcpp::Publisher<sensor_msgs::msg::Joy>::SharedPtr button_publisher_;
     rclcpp::Publisher<omni_msgs::msg::OmniButtonEvent>::SharedPtr button_event_publisher_;
-    rclcpp::Subscription<omni_msgs::msg::OmniFeedback>::SharedPtr haptic_sub_;
+    rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr haptic_sub_;
     OmniState* state_;
 
     // Parameters
