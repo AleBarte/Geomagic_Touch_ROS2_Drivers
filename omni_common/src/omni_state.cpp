@@ -21,7 +21,7 @@ geoRos::geoRos(const std::string &node_name)
     this->button_event_publisher_  = this->create_publisher<omni_msgs::msg::OmniButtonEvent>(button_event_topic, 10);
 
     std::ostringstream stream2;
-    stream2 << node_name << "/buttons";
+    stream2 << node_name << "0/buttons";
     std::string button_topic = std::string(stream2.str());
     this->button_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>(button_topic, 10);
 

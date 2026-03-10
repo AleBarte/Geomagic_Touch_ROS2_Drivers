@@ -79,20 +79,22 @@ This can be used to calibrate the device, read encoders, apply test forces etc.
 
 Clone and build this repository.
 ```
-cd <ROS_workspace>/devel
-source setup.bash
-roslaunch omni_common omni_state.launch 
+cd <ROS_workspace>
+source install/setup.bash
+ros2 run omni_common master 
 ```
 
 Data from the haptic device can be read from the following topics:
 
-  /phantom/button
+  /touch0/buttons
   
-  /phantom/force_feedback
+  /touch/force_feedback
   
-  /phantom/joint_states
+  /touch/joint_states
   
-  /phantom/pose
+  /touch0/pose
+
+  /touch0/twist
   
   /phantom/state 
 
@@ -127,6 +129,11 @@ https://github.com/fsuarez6/phantom_omni
 http://dsc.sensable.com/viewtopic.php?t=5730&sid=9866fe798e24bc745fdb7fce08ee99eb
 
 **Old device drivers** https://drive.google.com/drive/folders/1WJY6HpdtGh5zeyASfb4FYJFFG-QGItd6?usp=sharing
+
+## Troubleshooting
+1. On ubuntu 22.04 with the latest device drivers, the haptic rendering of the Touch seems to be susceptible to the presence of other
+HID devices (e.g. external mouse). When commanding a force to the touch, if the latter starts to vibrate or shake vilently try to unplug
+all other usb devices from your PC and reconnect the haptic device. This should fix the issue.
 
 ## Citation
 
