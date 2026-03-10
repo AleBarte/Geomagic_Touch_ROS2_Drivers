@@ -4,8 +4,42 @@
 
 int calibrationStyle;
 
+void logMapSO3(hduMatrix rot, hduMatrix rot_prev, hduVector3Dd& body_angular_vel)
+{
+  static double dt = 1.0 / 1000.0; //! Hardcoded
+  Eigen::Matrix3d Rk = Eigen::Matrix3d::Zero();
+  Eigen::Matrix3d Rkm1 = Eigen::Matrix3d::Zero();
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      Rk(i, j) = rot[i][j];
+      Rkm1(i, j) = rot_prev[i][j];
+    }
+  }
+
+  Eigen::Matrix3d Delta_R = Rkm1.transpose() * Rk;
+  Eigen::AngleAxisd angle_axis;
+  angle_axis.fromRotationMatrix(Delta_R);
+  double gamma = angle_axis.angle();
+
+  Eigen::Matrix3d omega_skew = gamma / (2 * std::sin(gamma) + 1e-5) * (Delta_R - Delta_R.transpose()) / dt;
+  body_angular_vel[0] = -omega_skew(1, 2);
+  body_angular_vel[1] = omega_skew(0, 2);
+  body_angular_vel[2] = -omega_skew(0, 1);
+}
+
 HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
 {
+  static hduMatrix rot_prev(1.0, 0.0, 0.0, 0.0,
+                            0.0, 1.0, 0.0, 0.0,
+                            0.0, 0.0, 1.0, 0.0,
+                            0.0, 0.0, 0.0, 1.0);
+
+  static hduVector3Dd filtered_body_ang_vel(0.0, 0.0, 0.0);
+  static bool initialized = false;
+  if (!initialized) {
+    rot_prev.getRotationMatrix(rot_prev);
+    initialized = true;
+  }
   OmniState *omni_state = static_cast<OmniState *>(pUserData);
   if (hdCheckCalibration() == HD_CALIBRATION_NEEDS_UPDATE) {
       std::cout << "Updating Calibration.." << std::endl;
@@ -18,6 +52,7 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
   hdGetDoublev(HD_CURRENT_JOINT_ANGLES, omni_state->joints);
   hduVector3Dd gimbal_angles;
   hdGetDoublev(HD_CURRENT_GIMBAL_ANGLES, gimbal_angles);
+  hduVector3Dd body_ang_vel;
   // Notice that we are inverting the Z-position value and changing Y <---> Z
   // Position
   omni_state->position = hduVector3Dd(transform[3][0], -transform[3][2], transform[3][1]);
@@ -30,7 +65,8 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
                              0.0,  0.0, 1.0, 0.0,
                              0.0,  0.0, 0.0, 1.0);
   rotation_offset.getRotationMatrix(rotation_offset);
-  omni_state->rot = hduQuaternion(rotation_offset * rotation);
+  hduMatrix current_rot(rotation_offset * rotation);
+  omni_state->rot = hduQuaternion(current_rot);
   // Velocity estimation
   hduVector3Dd vel_buff(0, 0, 0);
   vel_buff = (omni_state->position * 3 - 4 * omni_state->pos_hist1
@@ -48,6 +84,12 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
   omni_state->out_vel2 = omni_state->out_vel1;
   omni_state->out_vel1 = omni_state->velocity;
 
+  // Compute Body Angular Velocity through the SO(3) Logarithmic map
+  logMapSO3(current_rot, rot_prev, body_ang_vel);
+  filtered_body_ang_vel = 0.99 * filtered_body_ang_vel + 0.01 * body_ang_vel;
+  omni_state->body_angular_velocity[0] = filtered_body_ang_vel[0];
+  omni_state->body_angular_velocity[1] = filtered_body_ang_vel[2];
+  omni_state->body_angular_velocity[2] = -filtered_body_ang_vel[1];
   //~ // Set forces if locked
   //~ if (omni_state->lock == true) {
     //~ omni_state->force = 0.04 * omni_state->units_ratio * (omni_state->lock_pos - omni_state->position)
@@ -80,6 +122,8 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
       gimbal_angles[1], gimbal_angles[2] };
   for (int i = 0; i < 7; i++)
     omni_state->thetas[i] = t[i];
+
+  rot_prev = current_rot;
   return HD_CALLBACK_CONTINUE;
 }
 

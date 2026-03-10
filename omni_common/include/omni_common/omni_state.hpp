@@ -32,7 +32,7 @@
 struct OmniState {
   hduVector3Dd position;  //3x1 vector of position
   hduVector3Dd velocity;  //3x1 vector of velocity
-  hduVector3Dd angular_velocity;
+  hduVector3Dd body_angular_velocity;
   hduVector3Dd inp_vel1;  //3x1 history of velocity used for filtering velocity estimate
   hduVector3Dd inp_vel2;
   hduVector3Dd inp_vel3;

@@ -21,7 +21,7 @@ geoRos::geoRos(const std::string &node_name)
     this->button_event_publisher_  = this->create_publisher<omni_msgs::msg::OmniButtonEvent>(button_event_topic, 10);
 
     std::ostringstream stream2;
-    stream2 << node_name << "/button";
+    stream2 << node_name << "/buttons";
     std::string button_topic = std::string(stream2.str());
     this->button_publisher_ = this->create_publisher<sensor_msgs::msg::Joy>(button_topic, 10);
 
@@ -31,7 +31,7 @@ geoRos::geoRos(const std::string &node_name)
     this->state_publisher_ = this->create_publisher<omni_msgs::msg::OmniState>(state_topic_name, 10);
 
     std::ostringstream stream4;
-    stream4 << node_name << "/pose";
+    stream4 << node_name << "0/pose";
     std::string pose_topic_name = std::string(stream4.str());
     this->pose_publisher_ = this->create_publisher<geometry_msgs::msg::PoseStamped>(pose_topic_name, 10);
 
@@ -41,7 +41,7 @@ geoRos::geoRos(const std::string &node_name)
     this->joint_publisher_ = this->create_publisher<sensor_msgs::msg::JointState>(joint_topic_name, 10);
 
     std::ostringstream stream6;
-    stream6 << node_name << "/twist";
+    stream6 << node_name << "0/twist";
     std::string twist_topic_name = std::string(stream6.str());
     this->twist_publisher_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(twist_topic_name, 10);
 
@@ -69,7 +69,7 @@ void geoRos::init(OmniState* s)
     this->state_->buttons_prev[1] = 0;
     hduVector3Dd zeros(0, 0, 0);
     this->state_->velocity = zeros;
-    this->state_->angular_velocity = zeros;
+    this->state_->body_angular_velocity = zeros;
     this->state_->inp_vel1 = zeros;
     this->state_->inp_vel2 = zeros;
     this->state_->inp_vel3 = zeros;
@@ -153,9 +153,9 @@ void geoRos::publish()
     state_msg.velocity.x= this->state_->velocity[0];
     state_msg.velocity.y = this->state_->velocity[1];
     state_msg.velocity.z = this->state_->velocity[2];
-    state_msg.angular_velocity.x = this->state_->angular_velocity[0];
-    state_msg.angular_velocity.y = this->state_->angular_velocity[1];
-    state_msg.angular_velocity.z = this->state_->angular_velocity[2];
+    state_msg.body_angular_velocity.x = this->state_->body_angular_velocity[0];
+    state_msg.body_angular_velocity.y = this->state_->body_angular_velocity[1];
+    state_msg.body_angular_velocity.z = this->state_->body_angular_velocity[2];
     //TODO: Add Angular Velocity
     //TODO: Purge from this insane msg definition
 
@@ -196,9 +196,9 @@ void geoRos::publish()
     twist_msg.twist.linear.y = state_msg.velocity.y / 1000.0; 
     twist_msg.twist.linear.z = state_msg.velocity.z / 1000.0;
     //TODO: Fill angular velocity
-    twist_msg.twist.angular.x = state_msg.angular_velocity.x;
-    twist_msg.twist.angular.y = state_msg.angular_velocity.y;
-    twist_msg.twist.angular.z = state_msg.angular_velocity.z;
+    twist_msg.twist.angular.x = state_msg.body_angular_velocity.x;
+    twist_msg.twist.angular.y = state_msg.body_angular_velocity.y;
+    twist_msg.twist.angular.z = state_msg.body_angular_velocity.z;
 
     if ((this->state_->buttons[0] != this->state_->buttons_prev[0])
         || (this->state_->buttons[1] != this->state_->buttons_prev[1]))
