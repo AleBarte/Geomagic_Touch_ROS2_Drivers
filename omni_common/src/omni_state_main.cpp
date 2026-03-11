@@ -16,15 +16,17 @@ void logMapSO3(hduMatrix rot, hduMatrix rot_prev, hduVector3Dd& body_angular_vel
     }
   }
 
-  Eigen::Matrix3d Delta_R = Rkm1.transpose() * Rk;
+  Eigen::Matrix3d Delta_R = Rk * Rkm1.transpose();
   Eigen::AngleAxisd angle_axis;
   angle_axis.fromRotationMatrix(Delta_R);
   double gamma = angle_axis.angle();
 
   Eigen::Matrix3d omega_skew = gamma / (2 * std::sin(gamma) + 1e-5) * (Delta_R - Delta_R.transpose()) / dt;
-  body_angular_vel[0] = -omega_skew(1, 2);
-  body_angular_vel[1] = omega_skew(0, 2);
-  body_angular_vel[2] = -omega_skew(0, 1);
+
+  // No minus sign here needed
+  body_angular_vel[0] = omega_skew(1, 2);
+  body_angular_vel[1] = -omega_skew(0, 2);
+  body_angular_vel[2] = omega_skew(0, 1);
 }
 
 HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
@@ -88,8 +90,8 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
   logMapSO3(current_rot, rot_prev, body_ang_vel);
   filtered_body_ang_vel = 0.99 * filtered_body_ang_vel + 0.01 * body_ang_vel;
   omni_state->body_angular_velocity[0] = filtered_body_ang_vel[0];
-  omni_state->body_angular_velocity[1] = filtered_body_ang_vel[2];
-  omni_state->body_angular_velocity[2] = -filtered_body_ang_vel[1];
+  omni_state->body_angular_velocity[1] = filtered_body_ang_vel[1];
+  omni_state->body_angular_velocity[2] = filtered_body_ang_vel[2];
   //~ // Set forces if locked
   //~ if (omni_state->lock == true) {
     //~ omni_state->force = 0.04 * omni_state->units_ratio * (omni_state->lock_pos - omni_state->position)
