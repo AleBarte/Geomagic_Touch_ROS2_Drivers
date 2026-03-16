@@ -42,6 +42,7 @@ cd ~/Downloads/TouchDriver_2025_12_10+1/TouchDriver_2025_12_10/
 ./install_haptic_driver
 ```
 This should install the drivers for the Geomagic Touch.
+
 **Note:** The version of the drivers may change in time. Please adjust the instructions accordingly to the version of the drivers which you download.
 
 5. **(Only for 64-bit Systems)** Create Symbolic Links to OpenHaptics SDK Libraries:
