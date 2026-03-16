@@ -14,7 +14,7 @@ ROS packages developed by the [Group of Robots and Intelligent Machines](http://
 1. Install Dependencies
 
 ```
-sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexpat1-dev libglw1-mesa libglw1-mesa-dev libmotif-dev libncurses5-dev libraw1394-dev libx11-dev libxdamage-dev libxext-dev libxt-dev libxxf86vm-dev tcsh unzip x11proto-dri2-dev x11proto-gl-dev x11proto-print-dev
+sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexpat1-dev libglw1-mesa libglw1-mesa-dev libmotif-dev libncurses5-dev libraw1394-dev libx11-dev libxdamage-dev libxext-dev libxt-dev libxxf86vm-dev tcsh unzip x11proto-dri2-dev x11proto-gl-dev
 ```
 
 2. On Ubuntu 14.04:
@@ -96,7 +96,7 @@ Data from the haptic device can be read from the following topics:
 
   /touch0/twist
   
-  /phantom/state 
+  /touch/state 
 
 ## Use Multiple Devices
 
@@ -132,7 +132,7 @@ http://dsc.sensable.com/viewtopic.php?t=5730&sid=9866fe798e24bc745fdb7fce08ee99e
 
 ## Troubleshooting
 1. On ubuntu 22.04 with the latest device drivers, the haptic rendering of the Touch seems to be susceptible to the presence of other
-HID devices (e.g. external mouse). When commanding a force to the touch, if the latter starts to vibrate or shake vilently try to unplug
+HID devices (e.g. external mouse). When commanding a force to the touch, if the latter starts to vibrate or shake violently try to unplug
 all other usb devices from your PC and reconnect the haptic device. This should fix the issue.
 
 ## Citation
