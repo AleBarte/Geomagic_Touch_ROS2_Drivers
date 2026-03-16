@@ -11,17 +11,17 @@ ROS packages developed by the [Group of Robots and Intelligent Machines](http://
 
 ## Installation
 
-1. Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexpat1-dev libglw1-mesa libglw1-mesa-dev libmotif-dev libncurses5-dev libraw1394-dev libx11-dev libxdamage-dev libxext-dev libxt-dev libxxf86vm-dev tcsh unzip x11proto-dri2-dev x11proto-gl-dev
 ```
 
-2. Download and Extract OpenHaptics and Haptic Device Drivers:
+### 2. Download and Extract OpenHaptics and Haptic Device Drivers:
 
 Download drivers and OpenHaptics [here](https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34?language=en_US) by clicking on the corresponding links.
 
-3. Install OpenHaptics
+### 3. Install OpenHaptics
 
 In your ``Downloads`` folder there should be zipped archive named ``openhaptics_3.4-0-developer-edition-amd64.tar.gz``. Unpack the archive and execute the following
 commands from terminal:
@@ -33,7 +33,7 @@ sudo ./install
 ```
 **Note:** The folder also contains a readme file. If something fails during the installation, please refer to it.
 
-4. Install Geomagic Touch Drivers:
+### 4. Install Geomagic Touch Drivers:
 
 In the ``Downloads`` folder on your PC there should be a zipped archive named ``TouchDriver_2025_12_10+1``. Unpack the archive and execute the following commands
 from terminal:
@@ -45,7 +45,7 @@ This should install the drivers for the Geomagic Touch.
 
 **Note:** The version of the drivers may change in time. Please adjust the instructions accordingly to the version of the drivers which you download.
 
-5. **(Only for 64-bit Systems)** Create Symbolic Links to OpenHaptics SDK Libraries:
+### 5. **(Only for 64-bit Systems)** Create Symbolic Links to OpenHaptics SDK Libraries:
 ```bash
 sudo ln -s /usr/lib/x86_64-linux-gnu/libraw1394.so.11.0.1 /usr/lib/libraw1394.so.8
 sudo ln -s /usr/lib64/libPHANToMIO.so.4.3 /usr/lib/libPHANToMIO.so.4
@@ -53,7 +53,8 @@ sudo ln -s /usr/lib64/libHD.so.3.0.0 /usr/lib/libHD.so.3.0
 sudo ln -s /usr/lib64/libHL.so.3.0.0 /usr/lib/libHL.so.3.0 
 ```
 
-6. Device Setup:
+### 6. Device Setup:
+
 To complete the setup of the device we need to modify the rules contained in ``/etc/udev/rules.d/99-3dsystems.rules``.
 
 To do so, open a terminal and type the following command:
@@ -89,7 +90,8 @@ sudo udevadm trigger
 sudo reboot
 ```
 
-7. Testing the Device
+### 7. Testing the Device
+
 Before connecting the device via USB, remove all other external HID devices from your USB ports (mouses, joysticks, etc.) as these may cause
 conflicts with the haptic feedback of the Geomagic Touch as explained in the [Troubleshooting](#troubleshooting) section of this readme.
 
