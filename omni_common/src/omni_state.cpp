@@ -98,6 +98,9 @@ void geoRos::init(OmniState* s)
     }
     RCLCPP_INFO(this->get_logger(), "Geomagic position given in [%s], ratio [%.1f]", this->units_.c_str(), this->state_->units_ratio);
 
+    this->state_->dt = 1.0 / this->publishing_rate_;
+    RCLCPP_INFO(this->get_logger(), "Geomagic touch sampling time is [%.1f] [s]", this->state_->dt);
+
     this->is_initialized_ = true;
 }
 

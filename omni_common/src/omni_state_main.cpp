@@ -4,9 +4,8 @@
 
 int calibrationStyle;
 
-void logMapSO3(hduMatrix rot, hduMatrix rot_prev, hduVector3Dd& body_angular_vel)
+void logMapSO3(hduMatrix rot, hduMatrix rot_prev, hduVector3Dd& body_angular_vel, const double dt)
 {
-  static double dt = 1.0 / 1000.0; //! Hardcoded
   Eigen::Matrix3d Rk = Eigen::Matrix3d::Zero();
   Eigen::Matrix3d Rkm1 = Eigen::Matrix3d::Zero();
   for (int i = 0; i < 3; i++) {
@@ -90,7 +89,7 @@ HDCallbackCode HDCALLBACK omni_state_callback(void *pUserData)
   omni_state->out_vel1 = omni_state->velocity;
 
   // Compute Body Angular Velocity through the SO(3) Logarithmic map
-  logMapSO3(current_rot, rot_prev, body_ang_vel);
+  logMapSO3(current_rot, rot_prev, body_ang_vel, omni_state->dt);
   filtered_body_ang_vel = 0.99 * filtered_body_ang_vel + 0.01 * body_ang_vel;
   omni_state->body_angular_velocity[0] = filtered_body_ang_vel[0];
   omni_state->body_angular_velocity[1] = filtered_body_ang_vel[1];

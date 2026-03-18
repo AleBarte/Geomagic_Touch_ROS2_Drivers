@@ -51,6 +51,7 @@ struct OmniState {
   bool close_gripper;
   hduVector3Dd lock_pos;
   double units_ratio;
+  double dt;            // Inverse if the node publishing frequency
 };
 
 class geoRos : public rclcpp::Node
