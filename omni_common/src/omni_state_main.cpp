@@ -21,8 +21,11 @@ void logMapSO3(hduMatrix rot, hduMatrix rot_prev, hduVector3Dd& body_angular_vel
   angle_axis.fromRotationMatrix(Delta_R);
   double gamma = angle_axis.angle();
 
-  Eigen::Matrix3d omega_skew = gamma / (2 * std::sin(gamma) + 1e-5) * (Delta_R - Delta_R.transpose()) / dt;
-
+  Eigen::Matrix3d omega_skew = Eigen::Matrix3d::Zero();
+  if (std::abs(gamma) > 1e-5)
+  {
+    omega_skew = gamma / (2 * std::sin(gamma)) * (Delta_R - Delta_R.transpose()) / dt;
+  }
   // No minus sign here needed
   body_angular_vel[0] = omega_skew(1, 2);
   body_angular_vel[1] = -omega_skew(0, 2);
